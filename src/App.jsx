@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import styles from './App.module.css';
 import React from 'react';
+import { EMAIL_REGEXP } from './utils';
+import { PASS_REGEXP } from './utils';
+import { emailErrors } from './utils';
+import { passwordErrors } from './utils';
+import { sendFormData } from './utils';
+import { InputField } from './components/InputField/InputField';
 
 export const App = () => {
 	const [formData, setFormData] = useState({
@@ -8,25 +14,28 @@ export const App = () => {
 		password: '',
 		confirmedPassword: '',
 	});
-	const [error, setError] = useState(null);
-	const { email, password, confirmedPassword } = formData;
-	const EMAIL_REGEXP = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
-	const PASS_REGEXP = /(?=.*[0-9])(?=.*[a-z])/g;
-	let newError = null;
+
+	const [errorData, setErrorData] = useState({
+		emailError: '',
+		passwordError: '',
+		confirmedPasswordError: '',
+	});
 
 	const onEmailChange = ({target}) => {
-		setFormData({
-			...formData,
+		setFormData(prevData => ({
+			...prevData,
 			email: target.value,
-		});
+		}));
 		if (!EMAIL_REGEXP.test(target.value)) {
-			newError = 'Неверная почта. Данные должны быть в формате @email.ru!'
+			setErrorData({...errorData, emailError: emailErrors.formatError});
 		} else if (target.value.length > 30) {
-			newError = 'Неверная почта. Должно быть не больше 30 символов!';
+			setErrorData({...errorData, emailError: emailErrors.maxLengthError});
 		} else if (target.value.length < 3) {
-			newError = 'Неверная почта. Должно быть не меньше 3 символов!';
+			setErrorData({...errorData, emailError: emailErrors.minLengthError});
+		} else {
+			clearError();
 		}
-		setError(newError);
+		console.log(errorData)
 	}
 
 	const onPasswordChange = ({target}) => {
@@ -35,11 +44,13 @@ export const App = () => {
 			password: target.value,
 		});
 		if (!PASS_REGEXP.test(target.value)) {
-			newError = 'Пароль должен содержать: хотя-бы одно число и хотя-бы одну латинскую букву в нижнем регистре!'
+			setErrorData({...errorData, passwordError: passwordErrors.formatError});
 		} else if (target.value.length < 6) {
-			newError = 'Слишком легкий пароль. Пароль должен быть не короче 6 символов!';
+			setErrorData({...errorData, passwordError: passwordErrors.minLengthError});
+		} else {
+			clearError()
 		}
-		setError(newError);
+		console.log(errorData)
 	}
 
 	const onConfirmedPasswordChange = ({target}) => {
@@ -48,13 +59,12 @@ export const App = () => {
 			confirmedPassword: target.value,
 		});
 		if (formData.password === formData.confirmedPassword) {
-			newError = 'Введенные пароли не совпадают!';
+			setErrorData({...errorData, confirmedPasswordError: passwordErrors.checkPasswordError});
+		} else {
+			clearError()
 		}
-		setError(newError);
-	}
-
-	const sendFormData = (formData) => {
-		console.log(formData);
+		console.log(errorData)
+		console.log(!!emailErrorHTML || !!passwordErrorHTML || !!confirmedPasswordErrorHTML)
 	}
 
 	const onSubmitRegistration = (event) => {
@@ -62,45 +72,54 @@ export const App = () => {
 		sendFormData(formData);
 	}
 
-    return (
+	const clearError = () => {
+		setErrorData({
+			emailError: '',
+			passwordError: '',
+			confirmedPasswordError: '',})
+	}
+
+	const emailErrorHTML = errorData.emailError && <div className={styles.error}>{errorData.emailError}</div>
+	const passwordErrorHTML = errorData.passwordError && <div className={styles.error}>{errorData.passwordError}</div>
+    const confirmedPasswordErrorHTML = errorData.confirmedPasswordError && <div className={styles.error}>{errorData.confirmedPasswordError}</div>
+
+	return (
 		<div className={styles.app}>
 			<div className={styles.header}>
 				<p className={styles.title}>Регистрация</p>
 			</div>
 			<form className={styles.form} onSubmit={onSubmitRegistration}>
-				<div className={styles['register-form']}>
-					<label htmlFor='email'>Почта</label>
-					<input
-						type='text'
-						id='email'
-						value={email}
+					<InputField
+						label={'Почта'}
+						type={'email'}
+						id={'email'}
+						value={formData.email}
+						name={'email'}
 						placeholder='Введите адрес ящика в формате @example.ru'
 						onChange={onEmailChange}
 					/>
-					<label htmlFor='pwd'>Пароль</label>
-					<input
-						type='password'
-						id='pwd'
-						value={password}
-						placeholder='Придумайте пароль'
+					<InputField
+						label={'Пароль'}
+						type={'password'}
+						id={'password'}
+						value={formData.password}
+						name={'password'}
+						placeholder='Введите пароль'
 						onChange={onPasswordChange}
 					/>
-					<label htmlFor='pwd-repeat'>Повторите пароль</label>
-					<input
-						type='password'
-						id='pwd-repeat'
-						value={confirmedPassword}
+					<InputField
+						label={'Повторите пароль'}
+						type={'password'}
+						id={'confirmedPassword'}
+						value={formData.confirmedPassword}
+						name={'confirmedPassword'}
 						placeholder='Повторите пароль'
 						onChange={onConfirmedPasswordChange}
 					/>
-					{error && <div className={styles.error}>{error}</div>}
-					<button
-						type='submit'
-						disabled={!!error}
-					>
+					{emailErrorHTML || passwordErrorHTML || confirmedPasswordErrorHTML}
+					<button type='submit' disabled={!emailErrorHTML || !passwordErrorHTML || !confirmedPasswordErrorHTML}>
 						Зарегистроваться
 					</button>
-				</div>
 			</form>
 		</div>
 	);

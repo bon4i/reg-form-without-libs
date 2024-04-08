@@ -32,21 +32,6 @@
     text-align: left;
 }
 
-.register-form {
-    display: flex;
-    flex-direction: column;
-}
-
-label {
-    font-size: 15px;
-    margin-bottom: 3px;
-}
-
-input {
-    height: 25px;
-    margin-bottom: 20px;
-}
-
 button {
     height: 35px;
     margin: 30px 0px 20px 0px;
@@ -78,4 +63,5 @@ button:disabled {
     height: 20px;
     color: rgb(233, 90, 90);
     font-size: 12px;
+    padding: 15px 0px 15px 0px;
 }
