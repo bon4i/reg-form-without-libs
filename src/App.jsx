@@ -58,13 +58,12 @@ export const App = () => {
 			...formData,
 			confirmedPassword: target.value,
 		});
-		if (formData.password === formData.confirmedPassword) {
+		if (formData.password !== target.value) {
 			setErrorData({...errorData, confirmedPasswordError: passwordErrors.checkPasswordError});
 		} else {
 			clearError()
 		}
 		console.log(errorData)
-		console.log(!!emailErrorHTML || !!passwordErrorHTML || !!confirmedPasswordErrorHTML)
 	}
 
 	const onSubmitRegistration = (event) => {
