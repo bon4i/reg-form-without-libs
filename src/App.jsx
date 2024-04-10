@@ -21,6 +21,8 @@ export const App = () => {
 		confirmedPasswordError: '',
 	});
 
+	const [disabledSubmit, setDisabledSubmit] = useState(true)
+
 	const onEmailChange = ({target}) => {
 		setFormData(prevData => ({
 			...prevData,
@@ -48,7 +50,7 @@ export const App = () => {
 		} else if (target.value.length < 6) {
 			setErrorData({...errorData, passwordError: passwordErrors.minLengthError});
 		} else {
-			clearError()
+			clearError();
 		}
 		console.log(errorData)
 	}
@@ -61,7 +63,8 @@ export const App = () => {
 		if (formData.password !== target.value) {
 			setErrorData({...errorData, confirmedPasswordError: passwordErrors.checkPasswordError});
 		} else {
-			clearError()
+			clearError();
+			checkFieldValidation();
 		}
 		console.log(errorData)
 	}
@@ -81,6 +84,12 @@ export const App = () => {
 	const emailErrorHTML = errorData.emailError && <div className={styles.error}>{errorData.emailError}</div>
 	const passwordErrorHTML = errorData.passwordError && <div className={styles.error}>{errorData.passwordError}</div>
     const confirmedPasswordErrorHTML = errorData.confirmedPasswordError && <div className={styles.error}>{errorData.confirmedPasswordError}</div>
+
+	const checkFieldValidation = () => {
+		if (formData.email && formData.password && formData.confirmedPassword) {
+			setDisabledSubmit(false)
+		}
+	}
 
 	return (
 		<div className={styles.app}>
@@ -116,7 +125,7 @@ export const App = () => {
 						onChange={onConfirmedPasswordChange}
 					/>
 					{emailErrorHTML || passwordErrorHTML || confirmedPasswordErrorHTML}
-					<button type='submit' disabled={!emailErrorHTML || !passwordErrorHTML || !confirmedPasswordErrorHTML}>
+					<button type='submit' disabled={disabledSubmit}>
 						Зарегистроваться
 					</button>
 			</form>
