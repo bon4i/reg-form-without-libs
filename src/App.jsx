@@ -22,6 +22,7 @@ export const App = () => {
 	});
 
 	const [disabledSubmit, setDisabledSubmit] = useState(true)
+	const [sumbitOnFocus, setSumbitOnFocus] = useState(false);
 	const submitButtonRef = useRef(null);
 
 	const onEmailChange = ({target}) => {
@@ -63,9 +64,9 @@ export const App = () => {
 			setErrorData({...errorData, confirmedPasswordError: passwordErrors.checkPasswordError});
 			setDisabledSubmit(true);
 		} else {
-			submitButtonRef.current.focus();
 			clearError();
 			checkFieldValidation();
+			setSumbitOnFocus(true);
 		}
 	}
 
@@ -90,6 +91,13 @@ export const App = () => {
 		if (formData.email && formData.password && formData.confirmedPassword) {
 			setDisabledSubmit(false);
 		}
+	}
+
+	if (sumbitOnFocus === true) {
+		setTimeout(() => {
+			submitButtonRef.current.focus();
+			setSumbitOnFocus(false);
+		}, 1)
 	}
 
 	return (
