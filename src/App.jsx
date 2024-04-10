@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import styles from './App.module.css';
 import React from 'react';
 import { EMAIL_REGEXP } from './utils';
@@ -22,6 +22,7 @@ export const App = () => {
 	});
 
 	const [disabledSubmit, setDisabledSubmit] = useState(true)
+	const submitButtonRef = useRef(null);
 
 	const onEmailChange = ({target}) => {
 		setFormData(prevData => ({
@@ -37,7 +38,6 @@ export const App = () => {
 		} else {
 			clearError();
 		}
-		console.log(errorData)
 	}
 
 	const onPasswordChange = ({target}) => {
@@ -52,7 +52,6 @@ export const App = () => {
 		} else {
 			clearError();
 		}
-		console.log(errorData)
 	}
 
 	const onConfirmedPasswordChange = ({target}) => {
@@ -62,11 +61,12 @@ export const App = () => {
 		});
 		if (formData.password !== target.value) {
 			setErrorData({...errorData, confirmedPasswordError: passwordErrors.checkPasswordError});
+			setDisabledSubmit(true);
 		} else {
+			submitButtonRef.current.focus();
 			clearError();
 			checkFieldValidation();
 		}
-		console.log(errorData)
 	}
 
 	const onSubmitRegistration = (event) => {
@@ -78,16 +78,17 @@ export const App = () => {
 		setErrorData({
 			emailError: '',
 			passwordError: '',
-			confirmedPasswordError: '',})
+			confirmedPasswordError: '',
+		});
 	}
 
-	const emailErrorHTML = errorData.emailError && <div className={styles.error}>{errorData.emailError}</div>
-	const passwordErrorHTML = errorData.passwordError && <div className={styles.error}>{errorData.passwordError}</div>
-    const confirmedPasswordErrorHTML = errorData.confirmedPasswordError && <div className={styles.error}>{errorData.confirmedPasswordError}</div>
+	const emailErrorHTML = errorData.emailError && <div className={styles.error}>{errorData.emailError}</div>;
+	const passwordErrorHTML = errorData.passwordError && <div className={styles.error}>{errorData.passwordError}</div>;
+    const confirmedPasswordErrorHTML = errorData.confirmedPasswordError && <div className={styles.error}>{errorData.confirmedPasswordError}</div>;
 
 	const checkFieldValidation = () => {
 		if (formData.email && formData.password && formData.confirmedPassword) {
-			setDisabledSubmit(false)
+			setDisabledSubmit(false);
 		}
 	}
 
@@ -125,7 +126,7 @@ export const App = () => {
 						onChange={onConfirmedPasswordChange}
 					/>
 					{emailErrorHTML || passwordErrorHTML || confirmedPasswordErrorHTML}
-					<button type='submit' disabled={disabledSubmit}>
+					<button ref={submitButtonRef} type='submit' disabled={disabledSubmit}>
 						Зарегистроваться
 					</button>
 			</form>
